@@ -8,7 +8,11 @@
       "Bash(git remote add:*)",
       "Bash(ssh:*)",
       "Bash(git push:*)",
-      "Bash(python src/main.py:*)"
+      "Bash(python src/main.py:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip show:*)",
+      "Bash(where:*)",
+      "Bash(py:*)"
     ]
   }
 }

@@ -5,10 +5,14 @@ from tkinter import messagebox
 from typing import Dict
 from src.core.timer import Timer
 from src.core.timer_manager import TimerManager
+from src.core.hotkey_manager import HotkeyManager
+from src.core.audio_manager import AudioManager
 from src.ui.timer_row import TimerRow
 from src.ui.themes import Theme
+from src.ui.timer_config_dialog import TimerConfigDialog
 from src.config.config_manager import ConfigManager
 from src.config.defaults import DEFAULT_TIMER
+from src.utils.alert_manager import AlertManager
 import uuid
 
 
@@ -36,6 +40,11 @@ class MainWindow(tk.Tk):
         self.config_manager = config_manager
         self.timer_manager = timer_manager
         self.timer_rows: Dict[str, TimerRow] = {}  # timer_id -> TimerRow
+
+        # Initialize hotkey, audio, and alert managers
+        self.hotkey_manager = HotkeyManager()
+        self.audio_manager = AudioManager()
+        self.alert_manager = AlertManager()
 
         # Load app state
         self.app_state = config_manager.load_app_state()
@@ -185,8 +194,35 @@ class MainWindow(tk.Tk):
         Args:
             timer_id: ID of timer to configure
         """
-        # Placeholder for Phase 4
-        messagebox.showinfo("Config", f"Timer configuration dialog\n(Phase 4)")
+        timer = self.timer_manager.get_timer(timer_id)
+        if not timer:
+            return
+
+        # Show config dialog
+        dialog = TimerConfigDialog(self, timer, self.theme, self.hotkey_manager)
+        config = dialog.show()
+
+        if config:
+            # Update timer
+            old_hotkey = timer.hotkey
+
+            timer.label = config['label']
+            timer.duration = config['duration']
+            timer.remaining = config['duration']  # Reset remaining time
+            timer.hotkey = config['hotkey']
+            timer.alert_config = config['alert']
+
+            # Update hotkey registration
+            if old_hotkey:
+                self.hotkey_manager.unregister_hotkey(old_hotkey)
+
+            if timer.hotkey:
+                self._register_timer_hotkey(timer)
+
+            # Update UI
+            if timer_id in self.timer_rows:
+                self.timer_rows[timer_id].label_widget.configure(text=timer.label)
+                self.timer_rows[timer_id].update_display()
 
     def _on_timer_delete(self, timer_id: str):
         """
@@ -195,6 +231,11 @@ class MainWindow(tk.Tk):
         Args:
             timer_id: ID of timer to delete
         """
+        # Get timer to unregister hotkey
+        timer = self.timer_manager.get_timer(timer_id)
+        if timer and timer.hotkey:
+            self.hotkey_manager.unregister_hotkey(timer.hotkey)
+
         # Remove from UI
         if timer_id in self.timer_rows:
             self.timer_rows[timer_id].destroy()
@@ -210,8 +251,7 @@ class MainWindow(tk.Tk):
         Args:
             timer: Timer that ticked
         """
-        # UI update is handled by scheduled update
-        pass
+        # UI update is handled by scheduled update in _schedule_ui_update
 
     def _on_timer_complete(self, timer: Timer):
         """
@@ -220,8 +260,33 @@ class MainWindow(tk.Tk):
         Args:
             timer: Timer that completed
         """
-        # Placeholder for Phase 3 (alerts)
         print(f"Timer completed: {timer.label}")
+
+        # Get alert configuration
+        alert_config = timer.alert_config or {}
+        visual_config = alert_config.get('visual', {})
+        audio_config = alert_config.get('audio', {})
+
+        # Visual alerts
+        if visual_config.get('flash_taskbar', True):
+            # Flash taskbar (Windows)
+            try:
+                hwnd = int(self.wm_frame(), 16)  # Get window handle
+                self.alert_manager.flash_taskbar_windows(hwnd)
+            except Exception:
+                pass  # Silently fail on non-Windows or if unavailable
+
+        # Start flashing timer row
+        if visual_config.get('flash_numbers', True) or visual_config.get('flash_background', False):
+            self._start_timer_flash(timer.id)
+
+        # Audio alert
+        if audio_config.get('enabled', False):
+            sound_file = audio_config.get('file', '')
+            volume = audio_config.get('volume', 80) / 100.0  # Convert to 0.0-1.0
+
+            if sound_file:
+                self.audio_manager.play_sound(sound_file, volume)
 
     def _schedule_ui_update(self):
         """Schedule periodic UI updates."""
@@ -231,6 +296,42 @@ class MainWindow(tk.Tk):
 
         # Schedule next update (100ms)
         self.after(100, self._schedule_ui_update)
+
+    def _register_timer_hotkey(self, timer: Timer):
+        """Register global hotkey for a timer."""
+        if not timer.hotkey:
+            return
+
+        def hotkey_callback():
+            # Thread-safe callback for Tkinter
+            self.after(0, lambda: self._execute_timer_hotkey(timer.id))
+
+        self.hotkey_manager.register_hotkey(timer.hotkey, hotkey_callback)
+
+    def _execute_timer_hotkey(self, timer_id: str):
+        """Execute timer toggle action from hotkey."""
+        timer = self.timer_manager.get_timer(timer_id)
+        if timer:
+            timer.toggle()
+
+    def _start_timer_flash(self, timer_id: str):
+        """Start visual alert flashing for a timer."""
+        if timer_id in self.timer_rows:
+            # Simple flash implementation - toggle every 500ms for 3 seconds
+            self._flash_timer_row(timer_id, count=0, max_count=6)
+
+    def _flash_timer_row(self, timer_id: str, count: int, max_count: int):
+        """Flash timer row recursively."""
+        if timer_id not in self.timer_rows or count >= max_count:
+            return
+
+        # Toggle flash
+        self.timer_rows[timer_id].flash_alert()
+
+        # Schedule next flash
+        self.after(500, lambda: self._flash_timer_row(
+            timer_id, count + 1, max_count
+        ))
 
     def _load_profile(self, profile_name: str):
         """
@@ -253,9 +354,10 @@ class MainWindow(tk.Tk):
         timer_data_list = profile.get("timers", [])
         self.timer_manager.load_from_dict_list(timer_data_list)
 
-        # Create UI rows for each timer
+        # Create UI rows for each timer and register hotkeys
         for timer in self.timer_manager.get_all_timers():
             self._create_timer_row(timer)
+            self._register_timer_hotkey(timer)
 
     def _save_current_profile(self):
         """Save current timers to active profile."""
@@ -297,8 +399,9 @@ class MainWindow(tk.Tk):
         # Window position would be saved here
         self.config_manager.save_app_state(self.app_state)
 
-        # Stop timer manager
+        # Stop managers
         self.timer_manager.stop()
+        self.hotkey_manager.stop()
 
         # Close window
         self.destroy()
