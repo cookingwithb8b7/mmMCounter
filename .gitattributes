@@ -1,0 +1,27 @@
+# Auto-detect text files and normalize line endings to LF in repository
+* text=auto
+
+# Source code
+*.py text eol=lf
+*.pyw text eol=lf
+
+# Configuration files
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Windows-specific files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files (don't touch line endings)
+*.wav binary
+*.mp3 binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
