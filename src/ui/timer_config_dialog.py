@@ -46,10 +46,28 @@ class TimerConfigDialog(tk.Toplevel):
         # Create UI
         self._create_widgets()
 
-        # Center on parent
+        # Center on parent with screen bounds checking
         self.update_idletasks()
+
+        # Calculate centered position
         x = parent.winfo_x() + (parent.winfo_width() // 2) - (self.winfo_width() // 2)
         y = parent.winfo_y() + (parent.winfo_height() // 2) - (self.winfo_height() // 2)
+
+        # Get screen dimensions
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        dialog_width = self.winfo_width()
+        dialog_height = self.winfo_height()
+
+        # Clamp X position (keep within screen bounds)
+        x = max(0, min(x, screen_width - dialog_width))
+
+        # Clamp Y position (ensure title bar is always accessible)
+        # Keep at least 30 pixels from top for title bar, and keep bottom visible
+        min_y = 0
+        max_y = screen_height - dialog_height
+        y = max(min_y, min(y, max_y))
+
         self.geometry(f"+{x}+{y}")
 
     def _create_widgets(self):
