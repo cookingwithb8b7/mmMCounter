@@ -43,9 +43,11 @@ ENV/
 Thumbs.db
 
 # Application-specific
-configs/profiles/*.json  # User profiles (keep default only)
-configs/app_state.json   # User session state
-*.log                    # Log files if generated
+configs/profiles/*.json       # User profiles
+!configs/profiles/default.json  # Except default template
+configs/app_state.json        # User session state
+*.log                         # Log files if generated
+nul                           # Windows null file artifact
 
 # Testing
 .pytest_cache/
