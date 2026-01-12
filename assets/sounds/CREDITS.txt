@@ -1,0 +1,29 @@
+Sound Credits
+
+All sounds are licensed under CC0 1.0 Universal (Public Domain Dedication)
+Source: Freesound.org
+
+beepbeep.wav
+- Author: Kodack
+- URL: https://freesound.org/people/Kodack/sounds/258193/
+- License: CC0 1.0
+
+sonar.wav
+- Author: KIZILSUNGUR
+- URL: https://freesound.org/people/KIZILSUNGUR/sounds/70299/
+- License: CC0 1.0
+
+sweetalertsound1.wav
+- Author: KIZILSUNGUR
+- URL: https://freesound.org/people/KIZILSUNGUR/sounds/72125/
+- License: CC0 1.0
+
+alertshort.wav
+- Author: Soundwarf
+- URL: https://freesound.org/people/Soundwarf/sounds/387533/
+- License: CC0 1.0
+
+phoneoffhooktone.wav
+- Author: AnthonyRamirez
+- URL: https://freesound.org/people/AnthonyRamirez/sounds/455409/
+- License: CC0 1.0

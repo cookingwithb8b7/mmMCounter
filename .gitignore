@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -59,7 +58,9 @@ htmlcov/
 dist/
 *.exe
 
-# Build artifacts (keep build/*.spec tracked in git)
+# Build artifacts (keep build/*.spec and build/*.bat tracked in git)
+build/dist/
+build/mmMCounter/
 build/*.exe
 build/*.dll
 build/*.pyd

@@ -25,7 +25,7 @@ DEFAULT_PROFILE = {
             },
             "audio": {
                 "enabled": True,
-                "file": "assets/sounds/default_alert.wav",
+                "file": "assets/sounds/beepbeep.wav",
                 "volume": 80
             }
         }

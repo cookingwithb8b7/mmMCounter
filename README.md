@@ -1,12 +1,16 @@
 # mmMCounter (Money-Making-Meta Counter)
 
-A lightweight, accessible timer application for tracking Minecraft item cooldowns with advanced hotkey support and customizable alerts.
+A lightweight, accessible timer application for tracking custom cooldowns with global hotkey support and extensive customization. Perfect for custom Minecraft servers, modded content, or any scenario requiring precise timing.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.11+-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
 
 ## Features
+
+Originally created to overcome the limitations of Windows Clock when tracking custom item cooldowns (inspired by the BlossomCraft SMP server), mmMCounter is a general-purpose timer for any scenario requiring precise cooldown tracking.
+
+**Note:** This app is designed for custom server items or modded content with cooldowns that aren't tracked in-game. Vanilla Minecraft already has [visual cooldown indicators](https://minecraft.wiki/w/Use_cooldown) for items like Ender Pearls, Chorus Fruit, Shields, etc., so tracking those isn't necessary.
 
 ### ⏱️ Multiple Timers
 - Create unlimited timers with custom labels and durations
@@ -112,18 +116,20 @@ Download the latest release from the [Releases](https://github.com/cookingwithb8
 
 ## Usage Examples
 
-### Speedrunning Setup
-```
-Timer 1: "Pearl" (4:00) - Hotkey: F13
-Timer 2: "Bed" (5:00) - Hotkey: F14
-Timer 3: "Eye" (0:45) - Hotkey: F15
+### Custom Server Setup (e.g., BlossomCraft SMP)
+
+```text
+Timer 1: "Genesis Orb" (4:00) - Hotkey: F13
+Timer 2: "Virgo" (1:00) - Hotkey: F14
+Timer 3: "Blossom Staff" (10s) - Hotkey: F15
 ```
 
-### PvP Setup
-```
-Timer 1: "Totem" (0:01) - Hotkey: Ctrl+Shift+1
-Timer 2: "Gapple" (0:30) - Hotkey: Ctrl+Shift+2
-Timer 3: "Chorus" (1:00) - Hotkey: Ctrl+Shift+3
+### Generic Use Case
+
+```text
+Timer 1: "Custom Item 1" (2:00) - Hotkey: Ctrl+Shift+1
+Timer 2: "Mining Item 1" (5:00) - Hotkey: Ctrl+Shift+2
+Timer 3: "Armor Item 1" (3:30) - Hotkey: Ctrl+Shift+3
 ```
 
 ### Using Gaming Mouse Buttons
@@ -319,13 +325,28 @@ pytest tests/ -v
 **AI Assistant:** Claude Sonnet 4.5 (Anthropic)
 **License:** MIT License
 
+**Inspiration:** Created to solve the limitations of Windows Clock when needing precise cooldown tracking. Originally inspired by custom item cooldowns on the BlossomCraft SMP server, now a general-purpose timer for any use case.
+
 ### Libraries Used
 - [pynput](https://github.com/moses-palmer/pynput) - Global hotkey support
 - [pygame](https://www.pygame.org/) - Audio playback
 - [PyInstaller](https://pyinstaller.org/) - Executable bundling
 
+### Audio Credits
+
+Alert sounds sourced from [Freesound.org](https://freesound.org/) - Community audio library
+
+All sounds licensed under CC0 1.0 Universal (Public Domain):
+- beepbeep.wav by Kodack
+- sonar.wav by KIZILSUNGUR
+- sweetalertsound1.wav by KIZILSUNGUR
+- alertshort.wav by Soundwarf
+- phoneoffhooktone.wav by AnthonyRamirez
+
+See [assets/sounds/CREDITS.txt](assets/sounds/CREDITS.txt) for full attribution details.
+
 ### Special Thanks
-- Minecraft speedrunning community for inspiration
+- BlossomCraft SMP community for the original inspiration
 - Beta testers and early users
 
 ## License
