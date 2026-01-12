@@ -424,19 +424,59 @@ class TimerConfigDialog(tk.Toplevel):
 
         modifiers = []
         regular_keys = []
+        has_modifiers = False
 
+        # Map of virtual key codes to readable names (physical keys)
+        vk_to_char = {
+            # Number row
+            48: '0', 49: '1', 50: '2', 51: '3', 52: '4',
+            53: '5', 54: '6', 55: '7', 56: '8', 57: '9',
+            # Letter keys (A-Z)
+            65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f',
+            71: 'g', 72: 'h', 73: 'i', 74: 'j', 75: 'k', 76: 'l',
+            77: 'm', 78: 'n', 79: 'o', 80: 'p', 81: 'q', 82: 'r',
+            83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x',
+            89: 'y', 90: 'z'
+        }
+
+        # First pass: collect modifiers
         for key in keys:
             if key in (keyboard.Key.ctrl_l, keyboard.Key.ctrl_r, keyboard.Key.ctrl):
                 if 'ctrl' not in modifiers:
                     modifiers.append('ctrl')
+                    has_modifiers = True
             elif key in (keyboard.Key.shift_l, keyboard.Key.shift_r, keyboard.Key.shift):
                 if 'shift' not in modifiers:
                     modifiers.append('shift')
+                    has_modifiers = True
             elif key in (keyboard.Key.alt_l, keyboard.Key.alt_r, keyboard.Key.alt):
                 if 'alt' not in modifiers:
                     modifiers.append('alt')
-            elif hasattr(key, 'char') and key.char:
-                # Regular character key
+                    has_modifiers = True
+
+        # Second pass: collect regular keys
+        # If modifiers are present, ALWAYS use VK code to get physical key
+        # This prevents Shift+1 from becoming "!" instead of "1"
+        for key in keys:
+            # Skip modifier keys
+            if key in (keyboard.Key.ctrl_l, keyboard.Key.ctrl_r, keyboard.Key.ctrl,
+                      keyboard.Key.shift_l, keyboard.Key.shift_r, keyboard.Key.shift,
+                      keyboard.Key.alt_l, keyboard.Key.alt_r, keyboard.Key.alt):
+                continue
+
+            # Always prefer VK code for physical key
+            if hasattr(key, 'vk') and key.vk is not None:
+                vk = key.vk
+                if vk in vk_to_char:
+                    # Known physical key (letter or number)
+                    regular_keys.append(vk_to_char[vk])
+                else:
+                    # Unknown VK - try to get readable name
+                    key_str = str(key).replace('Key.', '').replace('<', '').replace('>', '').replace("'", '')
+                    if key_str and key_str not in modifiers:
+                        regular_keys.append(key_str.lower())
+            elif hasattr(key, 'char') and key.char and not has_modifiers:
+                # Only use char if NO modifiers (plain key press)
                 regular_keys.append(key.char.lower())
 
         # Sort modifiers for consistency
