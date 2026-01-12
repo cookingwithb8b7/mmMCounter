@@ -258,16 +258,21 @@ class TimerConfigDialog(tk.Toplevel):
         )
         volume_slider.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
 
-        # Sound file selection (placeholder)
+        # Sound file selection
         sound_frame = tk.Frame(main_frame, bg=self.theme.bg_color)
         sound_frame.grid(row=10, column=0, columnspan=2, sticky='ew', pady=5)
 
+        # Get current sound file (or default if empty)
+        current_sound = audio_config.get('file', 'assets/sounds/beepbeep.wav')
+        # Extract just the filename for display
+        sound_filename = current_sound.split('/')[-1] if current_sound else 'beepbeep.wav'
+
         tk.Label(
             sound_frame,
-            text="Sound file: (Phase 5)",
+            text=f"Sound: {sound_filename}",
             bg=self.theme.bg_color,
             fg=self.theme.fg_color,
-            font=('Arial', 8)
+            font=('Arial', 9)
         ).pack(side=tk.LEFT)
 
         # Buttons

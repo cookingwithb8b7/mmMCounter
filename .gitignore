@@ -45,6 +45,7 @@ Thumbs.db
 configs/profiles/*.json       # User profiles
 !configs/profiles/default.json  # Except default template
 configs/app_state.json        # User session state
+logs/                         # Beta testing log files
 *.log                         # Log files if generated
 nul                           # Windows null file artifact
 
