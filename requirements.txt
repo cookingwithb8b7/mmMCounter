@@ -1,2 +1,10 @@
 # Python dependencies for mmMCounter
-# Will be populated in Phase 1
+
+# Global hotkey support (works without admin privileges)
+pynput==1.7.6
+
+# Audio playback with volume control
+pygame==2.5.2
+
+# Executable bundling
+pyinstaller==6.3.0

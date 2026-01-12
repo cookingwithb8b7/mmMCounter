@@ -1,0 +1,37 @@
+{
+  "profile_name": "default",
+  "version": "1.0",
+  "global_settings": {
+    "theme": "dark",
+    "always_on_top": true,
+    "window_position": {
+      "x": 100,
+      "y": 100
+    },
+    "window_size": {
+      "width": 400,
+      "height": 300
+    },
+    "default_font": {
+      "family": "Arial",
+      "size": 12,
+      "bold": false
+    },
+    "default_alert": {
+      "visual": {
+        "flash_numbers": true,
+        "flash_background": true,
+        "flash_window": false,
+        "flash_taskbar": true,
+        "flash_duration_ms": 3000,
+        "flash_interval_ms": 500
+      },
+      "audio": {
+        "enabled": true,
+        "file": "assets/sounds/default_alert.wav",
+        "volume": 80
+      }
+    }
+  },
+  "timers": []
+}
