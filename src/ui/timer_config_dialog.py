@@ -1,8 +1,7 @@
 """Timer configuration dialog for per-timer settings."""
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-from typing import Optional
+from tkinter import messagebox
 from src.core.timer import Timer
 
 
@@ -111,18 +110,45 @@ class TimerConfigDialog(tk.Toplevel):
         hotkey_frame = tk.Frame(main_frame, bg=self.theme.bg_color)
         hotkey_frame.grid(row=2, column=1, sticky='w', pady=5)
 
-        self.hotkey_entry = tk.Entry(hotkey_frame, width=20)
-        self.hotkey_entry.insert(0, self.timer.hotkey or "")
-        self.theme.apply_to_widget(self.hotkey_entry, "entry")
-        self.hotkey_entry.pack(side=tk.LEFT)
-
-        tk.Label(
+        # Current hotkey display
+        self.hotkey_var = tk.StringVar(value=self.timer.hotkey or "None")
+        self.hotkey_display = tk.Label(
             hotkey_frame,
-            text=" (e.g., ctrl+shift+1)",
-            bg=self.theme.bg_color,
-            fg=self.theme.fg_color,
-            font=('Arial', 8)
-        ).pack(side=tk.LEFT, padx=5)
+            textvariable=self.hotkey_var,
+            width=20,
+            bg=self.theme.entry_bg,
+            fg=self.theme.entry_fg,
+            anchor='w',
+            relief='sunken',
+            padx=5,
+            pady=3
+        )
+        self.hotkey_display.pack(side=tk.LEFT, padx=(0, 5))
+
+        # Capture button
+        self.capture_button = tk.Button(
+            hotkey_frame,
+            text="Press keys...",
+            width=12,
+            command=self._start_hotkey_capture
+        )
+        self.theme.apply_to_widget(self.capture_button, "button")
+        self.capture_button.pack(side=tk.LEFT, padx=2)
+
+        # Clear button
+        clear_button = tk.Button(
+            hotkey_frame,
+            text="X",
+            width=3,
+            command=self._clear_hotkey
+        )
+        self.theme.apply_to_widget(clear_button, "button")
+        clear_button.pack(side=tk.LEFT, padx=2)
+
+        # Hotkey capture state
+        self.capturing_hotkey = False
+        self.captured_keys = set()
+        self.hotkey_listener = None
 
         # Visual Alerts section
         tk.Label(
@@ -265,8 +291,11 @@ class TimerConfigDialog(tk.Toplevel):
             messagebox.showerror("Error", "Invalid duration format")
             return
 
-        # Validate hotkey
-        hotkey = self.hotkey_entry.get().strip() or None
+        # Get hotkey from captured value
+        hotkey = self.hotkey_var.get()
+        if hotkey == "None":
+            hotkey = None
+
         if hotkey and self.hotkey_manager:
             validation = self.hotkey_manager.validate_hotkey(hotkey)
             if not validation.get('valid', False):
@@ -314,3 +343,110 @@ class TimerConfigDialog(tk.Toplevel):
         """
         self.wait_window()
         return self.result
+
+    def _start_hotkey_capture(self):
+        """Start capturing hotkey input."""
+        from pynput import keyboard
+
+        # Update button text
+        self.capture_button.configure(text="Listening... (Esc to cancel)")
+        self.capturing_hotkey = True
+        self.captured_keys = set()
+
+        def on_press(key):
+            if not self.capturing_hotkey:
+                return False  # Stop listener
+
+            # Add key to captured set
+            self.captured_keys.add(key)
+
+            # Build hotkey string
+            hotkey_string = self._build_hotkey_string(self.captured_keys)
+
+            # Update display in real-time
+            self.hotkey_var.set(hotkey_string)
+
+        def on_release(key):
+            if not self.capturing_hotkey:
+                return False  # Stop listener
+
+            # Check for Escape to cancel
+            if key == keyboard.Key.esc:
+                self._stop_hotkey_capture()
+                return False  # Stop listener
+
+            # If we have at least one key, stop capturing
+            if len(self.captured_keys) > 0:
+                # Small delay to capture all keys
+                self.after(100, self._stop_hotkey_capture)
+                return False  # Stop listener
+
+        # Start listener in background
+        self.hotkey_listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+        self.hotkey_listener.start()
+
+    def _stop_hotkey_capture(self):
+        """Stop capturing hotkey input."""
+        self.capturing_hotkey = False
+
+        # Stop listener if running
+        if self.hotkey_listener:
+            self.hotkey_listener.stop()
+            self.hotkey_listener = None
+
+        # Reset button text
+        self.capture_button.configure(text="Press keys...")
+
+        # If no keys captured, don't change the hotkey
+        if len(self.captured_keys) == 0:
+            # Restore previous value or "None"
+            if self.timer.hotkey:
+                self.hotkey_var.set(self.timer.hotkey)
+            else:
+                self.hotkey_var.set("None")
+
+    def _clear_hotkey(self):
+        """Clear the current hotkey."""
+        self.hotkey_var.set("None")
+        self.captured_keys = set()
+
+    def _build_hotkey_string(self, keys):
+        """
+        Build a hotkey string from captured keys.
+
+        Args:
+            keys: Set of pynput Key/KeyCode objects
+
+        Returns:
+            Hotkey string like "ctrl+shift+1"
+        """
+        from pynput import keyboard
+
+        modifiers = []
+        regular_keys = []
+
+        for key in keys:
+            if key in (keyboard.Key.ctrl_l, keyboard.Key.ctrl_r, keyboard.Key.ctrl):
+                if 'ctrl' not in modifiers:
+                    modifiers.append('ctrl')
+            elif key in (keyboard.Key.shift_l, keyboard.Key.shift_r, keyboard.Key.shift):
+                if 'shift' not in modifiers:
+                    modifiers.append('shift')
+            elif key in (keyboard.Key.alt_l, keyboard.Key.alt_r, keyboard.Key.alt):
+                if 'alt' not in modifiers:
+                    modifiers.append('alt')
+            elif hasattr(key, 'char') and key.char:
+                # Regular character key
+                regular_keys.append(key.char.lower())
+
+        # Sort modifiers for consistency
+        modifier_order = {'ctrl': 0, 'shift': 1, 'alt': 2}
+        modifiers.sort(key=lambda x: modifier_order.get(x, 99))
+
+        # Build string
+        parts = modifiers + regular_keys
+
+        if len(parts) == 0:
+            return "None"
+
+        return '+'.join(parts)

@@ -33,5 +33,32 @@
       }
     }
   },
-  "timers": []
+  "timers": [
+    {
+      "id": "4d561138-f9fa-4d2e-a8c0-75febee5b690",
+      "label": "Timer 1",
+      "duration_seconds": 10,
+      "hotkey": null,
+      "state": {
+        "current_state": "stopped",
+        "remaining_seconds": 10
+      },
+      "alert": {
+        "visual": {
+          "flash_numbers": true,
+          "flash_background": true,
+          "flash_window": false,
+          "flash_taskbar": true,
+          "flash_duration_ms": 3000,
+          "flash_interval_ms": 500
+        },
+        "audio": {
+          "enabled": false,
+          "file": "",
+          "volume": 80
+        }
+      },
+      "font": null
+    }
+  ]
 }
