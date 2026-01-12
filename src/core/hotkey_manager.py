@@ -89,7 +89,7 @@ class HotkeyManager:
         Parse hotkey string into set of Key objects.
 
         Args:
-            hotkey_string: String like "ctrl+shift+1"
+            hotkey_string: String like "ctrl+shift+1" or "ctrl+f13"
 
         Returns:
             Set of Key/KeyCode objects or None if invalid
@@ -100,6 +100,7 @@ class HotkeyManager:
         for part in parts:
             part = part.strip()
 
+            # Modifiers
             if part == 'ctrl':
                 keys.add(keyboard.Key.ctrl_l)
                 keys.add(keyboard.Key.ctrl_r)
@@ -109,16 +110,66 @@ class HotkeyManager:
             elif part == 'alt':
                 keys.add(keyboard.Key.alt_l)
                 keys.add(keyboard.Key.alt_r)
+            # Single character keys
             elif len(part) == 1:
-                # Single character key
                 try:
                     keys.add(keyboard.KeyCode.from_char(part))
-                except:
+                except Exception:
                     print(f"Warning: Invalid key '{part}'")
                     return None
+            # Named special keys
             else:
-                print(f"Warning: Unsupported key '{part}'")
-                return None
+                # Try to get named key from pynput
+                # Map common name variations to pynput Key names
+                key_map = {
+                    # Function keys
+                    'f1': 'f1', 'f2': 'f2', 'f3': 'f3', 'f4': 'f4',
+                    'f5': 'f5', 'f6': 'f6', 'f7': 'f7', 'f8': 'f8',
+                    'f9': 'f9', 'f10': 'f10', 'f11': 'f11', 'f12': 'f12',
+                    'f13': 'f13', 'f14': 'f14', 'f15': 'f15', 'f16': 'f16',
+                    'f17': 'f17', 'f18': 'f18', 'f19': 'f19', 'f20': 'f20',
+                    'f21': 'f21', 'f22': 'f22', 'f23': 'f23', 'f24': 'f24',
+                    # Navigation keys
+                    'page_up': 'page_up', 'pageup': 'page_up',
+                    'page_down': 'page_down', 'pagedown': 'page_down',
+                    'home': 'home', 'end': 'end',
+                    'insert': 'insert', 'ins': 'insert',
+                    'delete': 'delete', 'del': 'delete',
+                    # Arrow keys
+                    'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
+                    # Numpad keys
+                    'num0': 'num0', 'num1': 'num1', 'num2': 'num2',
+                    'num3': 'num3', 'num4': 'num4', 'num5': 'num5',
+                    'num6': 'num6', 'num7': 'num7', 'num8': 'num8',
+                    'num9': 'num9',
+                    'num_multiply': 'num_multiply', 'num_add': 'num_add',
+                    'num_subtract': 'num_subtract', 'num_divide': 'num_divide',
+                    'num_decimal': 'num_decimal',
+                    # Lock keys
+                    'num_lock': 'num_lock', 'scroll_lock': 'scroll_lock',
+                    'caps_lock': 'caps_lock',
+                    # Special keys
+                    'space': 'space', 'enter': 'enter', 'tab': 'tab',
+                    'backspace': 'backspace', 'esc': 'esc', 'escape': 'esc',
+                    'pause': 'pause', 'print_screen': 'print_screen'
+                }
+
+                pynput_name = key_map.get(part)
+                if pynput_name:
+                    try:
+                        # Get the key from pynput's Key enum
+                        key_obj = getattr(keyboard.Key, pynput_name, None)
+                        if key_obj:
+                            keys.add(key_obj)
+                        else:
+                            print(f"Warning: Unsupported key '{part}'")
+                            return None
+                    except AttributeError:
+                        print(f"Warning: Unsupported key '{part}'")
+                        return None
+                else:
+                    print(f"Warning: Unsupported key '{part}'")
+                    return None
 
         return keys if keys else None
 

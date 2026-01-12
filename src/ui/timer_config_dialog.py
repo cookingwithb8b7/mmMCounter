@@ -454,7 +454,29 @@ class TimerConfigDialog(tk.Toplevel):
             71: 'g', 72: 'h', 73: 'i', 74: 'j', 75: 'k', 76: 'l',
             77: 'm', 78: 'n', 79: 'o', 80: 'p', 81: 'q', 82: 'r',
             83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x',
-            89: 'y', 90: 'z'
+            89: 'y', 90: 'z',
+            # Function keys (F1-F24)
+            112: 'f1', 113: 'f2', 114: 'f3', 115: 'f4',
+            116: 'f5', 117: 'f6', 118: 'f7', 119: 'f8',
+            120: 'f9', 121: 'f10', 122: 'f11', 123: 'f12',
+            124: 'f13', 125: 'f14', 126: 'f15', 127: 'f16',
+            128: 'f17', 129: 'f18', 130: 'f19', 131: 'f20',
+            132: 'f21', 133: 'f22', 134: 'f23', 135: 'f24',
+            # Navigation keys
+            33: 'page_up', 34: 'page_down',
+            35: 'end', 36: 'home',
+            45: 'insert', 46: 'delete',
+            # Arrow keys
+            37: 'left', 38: 'up', 39: 'right', 40: 'down',
+            # Numpad
+            96: 'num0', 97: 'num1', 98: 'num2', 99: 'num3',
+            100: 'num4', 101: 'num5', 102: 'num6', 103: 'num7',
+            104: 'num8', 105: 'num9',
+            106: 'num_multiply', 107: 'num_add', 109: 'num_subtract',
+            110: 'num_decimal', 111: 'num_divide',
+            # Special keys
+            144: 'num_lock', 145: 'scroll_lock',
+            19: 'pause', 44: 'print_screen'
         }
 
         # First pass: collect modifiers
@@ -482,11 +504,17 @@ class TimerConfigDialog(tk.Toplevel):
                       keyboard.Key.alt_l, keyboard.Key.alt_r, keyboard.Key.alt):
                 continue
 
+            # Check if it's a named special key (e.g., Key.page_up, Key.f13)
+            if isinstance(key, keyboard.Key):
+                key_name = key.name.lower()
+                regular_keys.append(key_name)
+                continue
+
             # Always prefer VK code for physical key
             if hasattr(key, 'vk') and key.vk is not None:
                 vk = key.vk
                 if vk in vk_to_char:
-                    # Known physical key (letter or number)
+                    # Known physical key (letter, number, or special)
                     regular_keys.append(vk_to_char[vk])
                 else:
                     # Unknown VK - try to get readable name
