@@ -80,7 +80,20 @@ LIGHT_THEME = {
     "alert_normal_color": "#000000"
 }
 
+HIGH_CONTRAST_THEME = {
+    "bg_color": "#000000",
+    "fg_color": "#ffffff",
+    "button_bg": "#000000",
+    "button_fg": "#ffff00",  # Yellow text
+    "button_active_bg": "#ffff00",
+    "entry_bg": "#000000",
+    "entry_fg": "#ffffff",
+    "alert_flash_color": "#ff00ff",  # Magenta for alerts
+    "alert_normal_color": "#00ff00"   # Green for normal
+}
+
 THEMES = {
     "dark": DARK_THEME,
-    "light": LIGHT_THEME
+    "light": LIGHT_THEME,
+    "high_contrast": HIGH_CONTRAST_THEME
 }

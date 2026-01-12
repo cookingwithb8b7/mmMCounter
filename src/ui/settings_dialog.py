@@ -95,7 +95,7 @@ class SettingsDialog:
         theme_combo = ttk.Combobox(
             theme_frame,
             textvariable=self.theme_var,
-            values=["dark", "light"],
+            values=["dark", "light", "high_contrast"],
             state="readonly",
             width=15
         )

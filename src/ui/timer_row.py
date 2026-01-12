@@ -4,6 +4,7 @@ import tkinter as tk
 from typing import Callable, Optional
 from src.core.timer import Timer
 from src.config.defaults import TimerState
+from src.utils.tooltip import add_tooltip
 
 
 class TimerRow(tk.Frame):
@@ -78,6 +79,10 @@ class TimerRow(tk.Frame):
         )
         self.theme.apply_to_widget(self.start_button, "button")
         self.start_button.grid(row=0, column=2, padx=2, pady=2)
+        add_tooltip(
+            self.start_button,
+            "Start/pause the timer (hotkey if configured)"
+        )
 
         # Reset button
         self.reset_button = tk.Button(
@@ -88,6 +93,7 @@ class TimerRow(tk.Frame):
         )
         self.theme.apply_to_widget(self.reset_button, "button")
         self.reset_button.grid(row=0, column=3, padx=2, pady=2)
+        add_tooltip(self.reset_button, "Reset timer to initial duration")
 
         # Config button (gear icon as text)
         self.config_button = tk.Button(
@@ -98,6 +104,10 @@ class TimerRow(tk.Frame):
         )
         self.theme.apply_to_widget(self.config_button, "button")
         self.config_button.grid(row=0, column=4, padx=2, pady=2)
+        add_tooltip(
+            self.config_button,
+            "Configure timer settings (label, duration, hotkey, alerts)"
+        )
 
         # Delete button
         self.delete_button = tk.Button(
@@ -108,6 +118,7 @@ class TimerRow(tk.Frame):
         )
         self.theme.apply_to_widget(self.delete_button, "button")
         self.delete_button.grid(row=0, column=5, padx=2, pady=2)
+        add_tooltip(self.delete_button, "Delete this timer")
 
     def _on_start_pause_click(self):
         """Handle start/pause button click."""
