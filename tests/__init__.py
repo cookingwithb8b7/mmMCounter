@@ -1,1 +1,1 @@
-"""Test suite for mmMCounter."""
+"""Test package for mmMCounter."""
