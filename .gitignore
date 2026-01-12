@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller (keep build/*.spec in git)
+*.manifest
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application-specific
+configs/profiles/*.json  # User profiles (keep default only)
+configs/app_state.json   # User session state
+*.log                    # Log files if generated
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Distribution
+dist/
+*.exe
+
+# Build artifacts (keep build/*.spec tracked in git)
+build/*.exe
+build/*.dll
+build/*.pyd
+build/warn*.txt
+build/xref*.html
