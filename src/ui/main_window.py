@@ -3,6 +3,8 @@
 import tkinter as tk
 from tkinter import messagebox
 from typing import Dict
+import uuid
+
 from src.core.timer import Timer
 from src.core.timer_manager import TimerManager
 from src.core.hotkey_manager import HotkeyManager
@@ -10,10 +12,11 @@ from src.core.audio_manager import AudioManager
 from src.ui.timer_row import TimerRow
 from src.ui.themes import Theme
 from src.ui.timer_config_dialog import TimerConfigDialog
+from src.ui.settings_dialog import SettingsDialog
+from src.ui.profile_manager import ProfileManagerDialog
 from src.config.config_manager import ConfigManager
 from src.config.defaults import DEFAULT_TIMER
 from src.utils.alert_manager import AlertManager
-import uuid
 
 
 class MainWindow(tk.Tk):
@@ -372,13 +375,89 @@ class MainWindow(tk.Tk):
             else:
                 messagebox.showerror("Error", "Failed to save profile")
 
+    def _switch_profile(self, profile_name: str):
+        """
+        Switch to a different profile.
+
+        Args:
+            profile_name: Name of profile to switch to
+        """
+        # Save current profile before switching
+        self._save_current_profile()
+
+        # Update current profile name
+        self.current_profile_name = profile_name
+
+        # Load new profile
+        self._load_profile(profile_name)
+
+    def _apply_theme(self, theme_name: str):
+        """
+        Apply a new theme to the application.
+
+        Args:
+            theme_name: Theme name ("dark" or "light")
+        """
+        self.theme = Theme(theme_name)
+
+        # Update window background
+        self.configure(bg=self.theme.bg_color)
+
+        # Update all timer rows
+        for timer_row in self.timer_rows.values():
+            timer_row.configure(bg=self.theme.bg_color)
+            # Note: Full theme re-application would require rebuilding widgets
+            # For now, user should restart app after theme change
+
+        messagebox.showinfo(
+            "Theme Changed",
+            "Theme will be fully applied on next restart"
+        )
+
     def _show_profile_manager(self):
-        """Show profile manager dialog (Phase 4)."""
-        messagebox.showinfo("Profiles", "Profile manager\n(Phase 4)")
+        """Show profile manager dialog."""
+        dialog = ProfileManagerDialog(
+            self,
+            self.config_manager,
+            self.current_profile_name,
+            self.theme,
+            on_profile_switch=self._switch_profile
+        )
+        dialog.show()
 
     def _show_settings(self):
-        """Show settings dialog (Phase 4)."""
-        messagebox.showinfo("Settings", "Settings dialog\n(Phase 4)")
+        """Show settings dialog."""
+        # Get current global settings
+        profile = self.config_manager.load_profile(self.current_profile_name)
+        if not profile:
+            return
+
+        global_settings = profile.get("global_settings", {})
+
+        # Show dialog
+        dialog = SettingsDialog(self, global_settings, self.theme)
+        new_settings = dialog.show()
+
+        if new_settings:
+            # Update profile with new settings
+            profile["global_settings"].update(new_settings)
+
+            # Save profile
+            if self.config_manager.save_profile(
+                self.current_profile_name, profile
+            ):
+                # Apply theme if changed
+                if new_settings["theme"] != self.theme.name:
+                    self._apply_theme(new_settings["theme"])
+
+                # Apply always-on-top if changed
+                current_topmost = global_settings.get("always_on_top", True)
+                if new_settings["always_on_top"] != current_topmost:
+                    self.attributes('-topmost', new_settings["always_on_top"])
+
+                messagebox.showinfo("Settings", "Settings saved successfully")
+            else:
+                messagebox.showerror("Error", "Failed to save settings")
 
     def _show_about(self):
         """Show about dialog."""
