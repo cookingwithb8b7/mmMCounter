@@ -42,17 +42,17 @@ def main():
         # Create default profile if it doesn't exist
         logger.info('Checking for default profile...')
         config_manager.create_default_profile()
-        logger.info('✓ Configuration ready')
+        logger.info('[OK] Configuration ready')
 
         # Initialize timer manager
         logger.info('Initializing timer manager...')
         timer_manager = TimerManager()
-        logger.info('✓ Timer manager ready')
+        logger.info('[OK] Timer manager ready')
 
         # Create and run main window
         logger.info('Creating main window...')
         app = MainWindow(config_manager, timer_manager)
-        logger.info('✓ Main window created')
+        logger.info('[OK] Main window created')
         logger.info('Starting main event loop...')
         logger.info('=' * 80)
 

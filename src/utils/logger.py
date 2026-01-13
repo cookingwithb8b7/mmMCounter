@@ -128,24 +128,24 @@ def log_startup_validation():
     ]
 
     if sounds_dir.exists():
-        logger.info(f'✓ Sounds directory found: {sounds_dir}')
+        logger.info(f'[OK] Sounds directory found: {sounds_dir}')
         for sound in expected_sounds:
             sound_path = sounds_dir / sound
             if sound_path.exists():
-                logger.info(f'  ✓ {sound} ({sound_path.stat().st_size} bytes)')
+                logger.info(f'  [OK] {sound} ({sound_path.stat().st_size} bytes)')
             else:
-                logger.warning(f'  ✗ MISSING: {sound}')
+                logger.warning(f'  [X] MISSING: {sound}')
                 issues.append(f'Missing sound file: {sound}')
     else:
-        logger.error(f'✗ Sounds directory NOT FOUND: {sounds_dir}')
+        logger.error(f'[X] Sounds directory NOT FOUND: {sounds_dir}')
         issues.append('Sounds directory missing')
 
     # Check fonts directory
     fonts_dir = base_path / 'assets' / 'fonts'
     if fonts_dir.exists():
-        logger.info(f'✓ Fonts directory found: {fonts_dir}')
+        logger.info(f'[OK] Fonts directory found: {fonts_dir}')
     else:
-        logger.warning(f'✗ Fonts directory NOT FOUND: {fonts_dir}')
+        logger.warning(f'[X] Fonts directory NOT FOUND: {fonts_dir}')
         issues.append('Fonts directory missing (non-critical)')
 
     # Check config directory
@@ -155,16 +155,16 @@ def log_startup_validation():
         config_dir = base_path / 'configs'
 
     if config_dir.exists():
-        logger.info(f'✓ Config directory found: {config_dir}')
+        logger.info(f'[OK] Config directory found: {config_dir}')
     else:
-        logger.info(f'ℹ Config directory will be created: {config_dir}')
+        logger.info(f'[i] Config directory will be created: {config_dir}')
 
     # Check default profile
     default_profile = base_path / 'configs' / 'profiles' / 'default.json'
     if default_profile.exists():
-        logger.info(f'✓ Default profile found: {default_profile}')
+        logger.info(f'[OK] Default profile found: {default_profile}')
     else:
-        logger.warning(f'✗ Default profile NOT FOUND: {default_profile}')
+        logger.warning(f'[X] Default profile NOT FOUND: {default_profile}')
         issues.append('Default profile missing')
 
     # Summary
@@ -173,7 +173,7 @@ def log_startup_validation():
         for issue in issues:
             logger.warning(f'  - {issue}')
     else:
-        logger.info('✓ All startup validation checks passed')
+        logger.info('[OK] All startup validation checks passed')
 
     logger.info('Startup validation complete.')
     logger.info('-' * 80)
